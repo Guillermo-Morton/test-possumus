@@ -1,13 +1,13 @@
-import { AuthProvider } from "./context/Auth.Provider";
+// import { AuthProvider } from "./context/Auth.Provider";
 import { CharactersProvider } from "./context/Characters.Provider";
 import Router from "./router";
 function App() {
   return (
-      <AuthProvider>
+      // <AuthProvider>
         <CharactersProvider>
           <Router/>
         </CharactersProvider>
-      </AuthProvider>
+      // </AuthProvider>
   );
 }
 
