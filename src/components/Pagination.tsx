@@ -12,11 +12,11 @@ const Pagination = () => {
         <div>
             {!loading && <p className="text-center text-xs">Showing from {from} to {to} entries</p>}
             <div className='w-full flex justify-center mt-2'>
-                <button disabled={disablePrev} onClick={()=> previousPage()} className={`${disablePrev ? 'bg-slate-700 text-slate-400' : 'bg-slate-700 border-r border-slate-600 hover:bg-slate-300'} px-3 py-1 rounded-l-lg`}>Prev</button>
+                <button disabled={disablePrev} onClick={()=> disablePrev || previousPage()} className={`${disablePrev ? 'bg-slate-700 text-slate-400' : 'bg-slate-700 border-r border-slate-600 hover:bg-slate-300'} px-3 py-1 rounded-l-lg`}>Prev</button>
                 {pages.map(e => (
                     <button key={e} onClick={()=> selectPage(e+1)} className={`${page === e+1 ? 'bg-slate-600' : 'bg-slate-700 '} border-r border-slate-600 py-1 px-2 hover:bg-slate-300`}>{e+1}</button>
                 ))}
-                <button disabled={disableNext} onClick={()=> nextPage()} className={`${disableNext ? 'bg-slate-700 text-slate-400' : 'bg-slate-700 hover:bg-slate-300'} px-3 py-1  rounded-r-lg`}>Next</button>
+                <button disabled={disableNext} onClick={()=> disableNext || nextPage()} className={`${disableNext ? 'bg-slate-700 text-slate-400' : 'bg-slate-700 hover:bg-slate-300'} px-3 py-1  rounded-r-lg`}>Next</button>
              </div>
         </div>
     );

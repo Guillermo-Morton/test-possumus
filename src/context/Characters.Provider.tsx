@@ -13,6 +13,9 @@ interface ProviderInterface {
 export interface Character {
     [key: string]: any;
 }
+interface FreePass {
+        [key: string]: any;
+}
 interface Response {
     count: number;
     next: string;
@@ -30,19 +33,53 @@ export interface ContextValueInterface {
     selectPage: Function;
     page: number;
     query: {records:number, length:number};
-    loading: Boolean
+    loading: Boolean,
+    extraInfo: FreePass,
+    getExtraInfo: Function
 }
+// interface keyInterface {
+//     key: keyof typeof pages;
+//     name: string;
+// }
+
 export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
     const [characters, setCharacters]= useState([])
     const [loading, setLoading] = useState(true)
-    const [query, setQuery]= useState({})
+    const [query, setQuery]= useState({records: 0, length:0})
     const [page, setPage] = useState(1)
+    const [extraInfo, setExtraInfo] = useState({})
+
     const axios = require('axios')
+
+    const getExtraInfo = (URLs: Array<string>, name: string) => {
+     
+        URLs.forEach(async(url) => {
+            axios.get(url)
+            .then((response: Response) => {
+                // handle success
+                console.log(response.data)
+                setExtraInfo((prevExtraInfo: FreePass) => {
+                    const key = {
+                        index: name,
+                        property: name
+                    } as {
+                        index: keyof typeof prevExtraInfo;
+                        property: string;
+                    }
+                    const prevArray : Array<FreePass> = prevExtraInfo[key.index]
+                    
+                    return ({...prevExtraInfo, [key.property]: (prevArray ? [...prevExtraInfo[key.index], response.data] : [response.data])})
+                })
+            })
+            .catch((error : object) =>  {
+                // handle error
+                console.log(error);
+            })
+        })
+    }
     const nextPage= () => {
         setLoading(true)
-        setTimeout(()=> {
-            setPage(prevPage => prevPage + 1 )
-        }, 2000)
+        setPage(prevPage => prevPage + 1 )
     }
     const previousPage= () => {
         setLoading(true)
@@ -70,8 +107,22 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
             setLoading(false)
         });
     },[page])
+
+    const values:ContextValueInterface = {
+        characters,
+        setCharacters,
+        previousPage, 
+        nextPage, 
+        query, 
+        selectPage, 
+        page, 
+        loading, 
+        extraInfo,
+        getExtraInfo
+    }
+
     return (
-        <CharactersContext.Provider value={{characters,setCharacters, previousPage, nextPage, query, selectPage, page, loading}}>
+        <CharactersContext.Provider value={values}>
             {children}
        </CharactersContext.Provider>
     );

@@ -1,35 +1,53 @@
 import { useLocation } from "react-router-dom";
-import { Character } from "../context/Characters.Provider";
-import { capitalize } from "../libraries/utils";
-const InfoList = ({character} : Character) => {
+import { Character, useCharacters, ContextValueInterface } from "../context/Characters.Provider";
+import { capitalize, subObject } from "../libraries/utils";
+const ListFlatInfo = ({character} : Character) => {
  const keys = Object.keys(character)
- console.log(keys)
  return (
      <div>
          {keys.map(key => (
-             <p key={key} className="rounded-lg bg-slate-900 px-3 mx-2 my-1 flex justify-between"><span>{capitalize(key)}:</span><span>{character[key]}</span></p>
-            //  <p key={key} className="rounded-lg bg-slate-900 px-3 mx-2 my-1">{`${capitalize(key)}: ${character[key]}`}</p>
+             <h4 key={key} className="rounded-lg bg-slate-900 px-3 mx-2 my-1 flex justify-between"><span>{capitalize(key.replace('_',' '))}:</span><span>{character[key]}</span></h4>
          ))}
      </div>
  )
 }
+const ListArrayInfo = ({character, avoid}: Character) => {
+    console.log('data', character)
+    const {getExtraInfo} = useCharacters() as ContextValueInterface
+    const keys = Object.keys(character)
+    console.log('keys', keys)
+    return (
+        <div>
+            {keys.map(key => {
+               const URLs: Array<string> = character[key]
+               if (!Array.isArray(URLs)) return null
+               return (URLs.length > 0 ?
+                    <div key={key} className="rounded-lg bg-slate-900 px-3 py-2 mx-2 my-1 flex  justify-between">
+                        <h4>{capitalize(key.replace('_',' '))}</h4>
+                        <button onClick={()=> getExtraInfo(URLs, key)} type="button" className="text-xs rounded-lg bg-slate-700 px-1 flex items-center">Expand</button>
+                    </div> : null
+                )
+            })}
+        </div>
+    )
+}
 const Info = ({className}:{className: string}) => {
     const {state} : Character = useLocation()
-    const infoToList = {
+    const flatInfo = {
         height: state.height/100 + 'm',
         mass: state.mass + 'kg',
-        gender: capitalize(state.gender)
+        gender: capitalize(state.gender),
+        eye_color: capitalize(state.eye_color),
+        skin_color: capitalize(state.skin_color),
+        birth_year: capitalize(state.birth_year),
     }
-    console.log(state)
+    const arrayInfo = subObject(['starships', 'vehicles', 'films'], state)
+    // const propertiesToAvoid = ['created','edited','url']
     return (
         <div className={`${className}`}>
             <h1 className="text-xl text-center mb-3">{state.name}</h1>
-            {/* <div className="w-full flex justify-center">
-                <span className="rounded-lg bg-slate-900 px-3 mx-2">{capitalize(state.gender)}</span>
-                <span className="rounded-lg bg-slate-900 px-3 mx-2">{state.height/100}m</span>
-                <span className="rounded-lg bg-slate-900 px-3 mx-2">{state.mass}kg</span>
-            </div> */}
-            <InfoList character={infoToList}/>
+            <ListFlatInfo character={flatInfo}/>
+            <ListArrayInfo character={arrayInfo} avoid={[]}/>
         </div>
     );
 };
