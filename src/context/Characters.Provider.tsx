@@ -1,4 +1,6 @@
 import React, { useContext , useEffect, useState} from 'react';
+import { findRenderedDOMComponentWithClass } from 'react-dom/test-utils';
+import { subObject } from '../libraries/utils';
 const CharactersContext = React.createContext({})
 
 
@@ -13,7 +15,7 @@ interface ProviderInterface {
 export interface Character {
     [key: string]: any;
 }
-interface FreePass {
+export interface FreePass {
         [key: string]: any;
 }
 interface Response {
@@ -25,17 +27,19 @@ interface Response {
 }
 export interface ContextValueInterface {
     characters: Array<{
-        [key: string]: any;
-    }>;
-    setCharacters: Function;
+        [key: string]: any
+    }>,
+    setCharacters: Function,
     nextPage: Function;
     previousPage: Function;
-    selectPage: Function;
-    page: number;
-    query: {records:number, length:number};
+    selectPage: Function,
+    page: number,
+    query: {records:number, length:number},
     loading: Boolean,
     extraInfo: FreePass,
-    getExtraInfo: Function
+    character: FreePass,
+    getExtraInfo: Function,
+    selectCharacter: Function
 }
 // interface keyInterface {
 //     key: keyof typeof pages;
@@ -48,34 +52,53 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
     const [query, setQuery]= useState({records: 0, length:0})
     const [page, setPage] = useState(1)
     const [extraInfo, setExtraInfo] = useState({})
+    const [character, setCharacter] = useState({})
 
     const axios = require('axios')
 
-    const getExtraInfo = (URLs: Array<string>, name: string) => {
-     
-        URLs.forEach(async(url) => {
-            axios.get(url)
-            .then((response: Response) => {
-                // handle success
-                console.log(response.data)
-                setExtraInfo((prevExtraInfo: FreePass) => {
-                    const key = {
-                        index: name,
-                        property: name
-                    } as {
-                        index: keyof typeof prevExtraInfo;
-                        property: string;
-                    }
-                    const prevArray : Array<FreePass> = prevExtraInfo[key.index]
-                    
-                    return ({...prevExtraInfo, [key.property]: (prevArray ? [...prevExtraInfo[key.index], response.data] : [response.data])})
+    const getExtraInfo = ({URLs, url} : {URLs: Array<string>, url: string}, name: string) => {
+        const key = {
+            index: name,
+            property: name
+        } as {
+            index: keyof typeof extraInfo;
+            property: string;
+        }
+        if(extraInfo[key.index]) {
+            const newObject = subObject({object: extraInfo, avoid:[key.property]})
+            setExtraInfo(newObject)
+        } else {
+            if(url) {
+                axios.get(url)
+                .then((response: Response) => {
+                    // handle success
+                    console.log(response.data)
+                    setExtraInfo((prevExtraInfo: FreePass) => {
+                        return ({...prevExtraInfo, [key.property]: response.data})
+                    })
+                })
+                .catch((error : object) =>  {
+                    // handle error
+                    console.log(error);
+                })
+            }
+            URLs?.forEach((url) => {
+                axios.get(url)
+                .then((response: Response) => {
+                    // handle success
+                    console.log(response.data)
+                    setExtraInfo((prevExtraInfo: FreePass) => {
+                        const prevArray : Array<FreePass> = prevExtraInfo[key.index]
+                        
+                        return ({...prevExtraInfo, [key.property]: (prevArray ? [...prevExtraInfo[key.index], response.data] : [response.data])})
+                    })
+                })
+                .catch((error : object) =>  {
+                    // handle error
+                    console.log(error);
                 })
             })
-            .catch((error : object) =>  {
-                // handle error
-                console.log(error);
-            })
-        })
+        }
     }
     const nextPage= () => {
         setLoading(true)
@@ -88,6 +111,18 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
     const selectPage= (page: number) => {
         setLoading(true)
         setPage(page)
+    }
+    const selectCharacter = (character: Character) => {
+        if(selectCharacter.name === character.name) return
+       
+        setCharacter((prevCharacter: Character)=> {
+            if(prevCharacter.name !== character.name) {
+                setExtraInfo({})
+                return character
+            } else {
+                return prevCharacter
+            }
+        })
     }
     useEffect(()=> {
         console.log('DIDMOUNT')
@@ -118,7 +153,9 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
         page, 
         loading, 
         extraInfo,
-        getExtraInfo
+        getExtraInfo,
+        character,
+        selectCharacter
     }
 
     return (
