@@ -7,7 +7,7 @@ const Pagination = () => {
     const disableNext = !numberOfPages || page===numberOfPages
 
     const to = page > 1 ? (10 * (page-1) + query.length ): query.length
-    const from = page === numberOfPages ? to - query.length: to - 10
+    const from = (page === numberOfPages ? to - query.length: to - 10) + 1
     return (
         <div>
             {!loading && <p className="text-center text-xs">Showing from {from} to {to} entries</p>}

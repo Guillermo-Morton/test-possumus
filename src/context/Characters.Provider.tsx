@@ -1,8 +1,7 @@
 import React, { useContext , useEffect, useState} from 'react';
-import { findRenderedDOMComponentWithClass } from 'react-dom/test-utils';
 import { subObject } from '../libraries/utils';
-const CharactersContext = React.createContext({})
 
+const CharactersContext = React.createContext({})
 
 export const useCharacters = () => {
     return useContext(CharactersContext)
@@ -13,10 +12,10 @@ interface ProviderInterface {
     [key: string]: any;
   }
 export interface Character {
-    [key: string]: any;
+    [key: string]: string | Array<string>;
 }
 export interface FreePass {
-        [key: string]: any;
+    [key: string]: any;
 }
 interface Response {
     count: number;
@@ -39,12 +38,10 @@ export interface ContextValueInterface {
     extraInfo: FreePass,
     character: FreePass,
     getExtraInfo: Function,
-    selectCharacter: Function
+    selectCharacter: Function,
+    onSearch: Function,
+    search: string
 }
-// interface keyInterface {
-//     key: keyof typeof pages;
-//     name: string;
-// }
 
 export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
     const [characters, setCharacters]= useState([])
@@ -53,6 +50,7 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
     const [page, setPage] = useState(1)
     const [extraInfo, setExtraInfo] = useState({})
     const [character, setCharacter] = useState({})
+    const [search, setSearch] = useState('')
 
     const axios = require('axios')
 
@@ -112,9 +110,12 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
         setLoading(true)
         setPage(page)
     }
+    const onSearch= (search: string) => {
+        setLoading(true)
+        setPage(1)
+        setSearch(search)
+    }
     const selectCharacter = (character: Character) => {
-        if(selectCharacter.name === character.name) return
-       
         setCharacter((prevCharacter: Character)=> {
             if(prevCharacter.name !== character.name) {
                 setExtraInfo({})
@@ -126,7 +127,7 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
     }
     useEffect(()=> {
         console.log('DIDMOUNT')
-        axios.get(`https://swapi.dev/api/people/?page=${page}`)
+        axios.get(`https://swapi.dev/api/people/?page=${page}${search ? `&search=${search}` : ''}`)
         .then((response: Response) => {
             // handle success
             console.log(response.data);
@@ -141,7 +142,7 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
             // always executed
             setLoading(false)
         });
-    },[page])
+    },[page, search])
 
     const values:ContextValueInterface = {
         characters,
@@ -155,7 +156,9 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
         extraInfo,
         getExtraInfo,
         character,
-        selectCharacter
+        selectCharacter,
+        onSearch,
+        search
     }
 
     return (
