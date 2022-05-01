@@ -66,6 +66,7 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
             const newObject = subObject({object: extraInfo, avoid:[key.property]})
             setExtraInfo(newObject)
         } else {
+            setExtraInfo({...extraInfo, [key.property]: {loading:true}})
             if(url) {
                 axios.get(url)
                 .then((response: Response) => {
@@ -86,9 +87,9 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
                     // handle success
                     console.log(response.data)
                     setExtraInfo((prevExtraInfo: FreePass) => {
-                        const prevArray : Array<FreePass> = prevExtraInfo[key.index]
+                        const prevArray : Array<FreePass> = Array.isArray(prevExtraInfo[key.index]) ? prevExtraInfo[key.index] : []
                         
-                        return ({...prevExtraInfo, [key.property]: (prevArray ? [...prevExtraInfo[key.index], response.data] : [response.data])})
+                        return ({...prevExtraInfo, [key.property]:  [...prevArray, response.data]})
                     })
                 })
                 .catch((error : object) =>  {

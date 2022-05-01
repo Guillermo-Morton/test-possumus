@@ -7,6 +7,14 @@ module.exports = {
       pattern: /bg-slate/,
       variants: ['hover'],
     },
+    {
+      pattern: /w/,
+      variants: ['after']
+    },
+    {
+      pattern: /h/,
+      variants: ['after']
+    },
   ],
   theme: {
     extend: {},
