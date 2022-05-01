@@ -71,7 +71,6 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
                 axios.get(url)
                 .then((response: Response) => {
                     // handle success
-                    console.log(response.data)
                     setExtraInfo((prevExtraInfo: FreePass) => {
                         return ({...prevExtraInfo, [key.property]: response.data})
                     })
@@ -85,7 +84,6 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
                 axios.get(url)
                 .then((response: Response) => {
                     // handle success
-                    console.log(response.data)
                     setExtraInfo((prevExtraInfo: FreePass) => {
                         const prevArray : Array<FreePass> = Array.isArray(prevExtraInfo[key.index]) ? prevExtraInfo[key.index] : []
                         
