@@ -125,11 +125,9 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
         })
     }
     useEffect(()=> {
-        console.log('DIDMOUNT')
         axios.get(`https://swapi.dev/api/people/?page=${page}${search ? `&search=${search}` : ''}`)
         .then((response: Response) => {
             // handle success
-            console.log(response.data);
             setQuery({records: response.data.count, length: response.data.results.length})
             setCharacters(response.data.results)
         })
