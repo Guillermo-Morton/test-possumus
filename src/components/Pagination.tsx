@@ -7,17 +7,23 @@ const Pagination = ({marginPagesDisplayed} : {marginPagesDisplayed: number}) => 
     const index = page - 1
     const startIndex = index-marginPagesDisplayed >= 0 ? index-marginPagesDisplayed : 0
     const finalIndex = index+marginPagesDisplayed+1
+    
+    // Showing margin mages only
     let dynamicPages: Array<{name:string|number, value:string|number}> = [...pages.slice(startIndex, finalIndex)].map(e => ({name:e+1, value:e+1}))
 
+    // Handle showing the last page always
     if (!(page+marginPagesDisplayed >= numberOfPages-1)) {
         dynamicPages = [...dynamicPages,{name:'...', value: page + (marginPagesDisplayed + 1 )}, {name:numberOfPages, value:numberOfPages}]
     } 
     else if (!(page+marginPagesDisplayed >= numberOfPages)) {
         dynamicPages = [...dynamicPages, {name:numberOfPages, value:numberOfPages}]
     }
+
+    // Handle showing the first page always
     if (index-marginPagesDisplayed > 1) {
         dynamicPages = [{name:1, value:1},{name:'...', value: page - (marginPagesDisplayed + 1 )}, ...dynamicPages]
-    }else if (index-marginPagesDisplayed > 0){
+    }
+    else if (index-marginPagesDisplayed > 0){
         dynamicPages = [{name:1, value:1},...dynamicPages]
     }
     const disablePrev = !numberOfPages || page===1

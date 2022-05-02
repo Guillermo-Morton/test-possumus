@@ -1,4 +1,4 @@
-import React, { useContext , useEffect, useState} from 'react';
+import React, { useContext , useEffect, useState, useRef} from 'react';
 import { subObject } from '../libraries/utils';
 
 const CharactersContext = React.createContext({})
@@ -105,14 +105,18 @@ export const CharactersProvider: React.FC<ProviderInterface> = ({children}) => {
         setLoading(true)
         setPage(prevPage => prevPage - 1 )
     }
-    const selectPage= (page: number) => {
+    const selectPage= (selectedPage: number) => {
+        if (page === selectedPage) return
         setLoading(true)
-        setPage(page)
+        setPage(selectedPage)
     }
-    const onSearch= (search: string) => {
+    const onSearch= (newSearch: string) => {
+        if(newSearch === search) return
         setLoading(true)
-        setPage(1)
-        setSearch(search)
+        if (1 !== page) {
+            setPage(1)
+        } 
+        setSearch(newSearch)
     }
     const selectCharacter = (character: Character) => {
         setCharacter((prevCharacter: Character)=> {
