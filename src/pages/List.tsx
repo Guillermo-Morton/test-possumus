@@ -26,7 +26,7 @@ const List = ({className}: {className: string}) => {
                 </div>
             }
             </div>
-            <Pagination/>
+            <Pagination marginPagesDisplayed={1}/>
            
         </section>
     );
